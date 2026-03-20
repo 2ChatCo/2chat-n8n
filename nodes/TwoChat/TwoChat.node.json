@@ -1,0 +1,22 @@
+{
+	"node": "n8n-nodes-base.twoChat",
+	"nodeVersion": "1.0",
+	"codexVersion": "1.0",
+	"categories": [
+		"Communication",
+		"Development",
+		"Utility"
+	],
+	"resources": {
+		"credentialDocumentation": [
+			{
+				"url": "https://developers.2chat.co/docs/API/authentication"
+			}
+		],
+		"primaryDocumentation": [
+			{
+				"url": "https://developers.2chat.co/docs/API/WhatsApp/send-message"
+			}
+		]
+	}
+}
