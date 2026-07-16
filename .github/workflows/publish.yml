@@ -1,0 +1,49 @@
+name: Publish to npm
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: read
+  id-token: write # required for npm provenance / OIDC trusted publishing
+
+jobs:
+  publish:
+    # This workflow file also lives in the private dev repo (rsync'd there by
+    # release.sh); only actually publish when running from the public mirror.
+    if: github.repository == '2ChatCo/2chat-n8n'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.15'
+          registry-url: 'https://registry.npmjs.org'
+
+      # Trusted publishing (OIDC) requires npm >= 11.5.1; the Node 20 bundled
+      # npm is older, so upgrade before publishing.
+      - name: Update npm
+        run: npm install -g npm@latest
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Publish
+        run: npm publish --provenance --access public
+        env:
+          # Only needed if the package is NOT configured for npm Trusted
+          # Publishing (npmjs.com -> package -> Settings -> Trusted Publisher).
+          # With Trusted Publishing set up, id-token: write above is enough
+          # and this token is unused.
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
